@@ -57,13 +57,17 @@ function MoviesList() {
   const [currentUser, setCurrentUser] = useState(() => getCurrentUser());
   const navigate = useNavigate();
   const favorites = currentUser ? getFavorites(currentUser.id) : [];
-  const heroMovie = Movies[0];
-  const trendingMovies = Movies.slice(1, 6);
-  const popularMovies = Movies.slice(6);
   const isTv = mediaType === "tv";
   const activeGenres = isTv ? tvGenres : movieGenres;
   const titleLabel = isTv ? "Series" : "Movies";
   const searchQuery = activeSearch.trim();
+  const normalizedSearch = searchQuery.toLowerCase();
+  const visibleMovies = normalizedSearch
+    ? Movies.filter((movie) => getTitle(movie).toLowerCase().includes(normalizedSearch))
+    : Movies;
+  const heroMovie = visibleMovies[0];
+  const trendingMovies = visibleMovies.slice(1, 6);
+  const popularMovies = visibleMovies.slice(6);
 
   const resetResults = useCallback((nextSearch = activeSearch) => {
     SetMovies([]);
@@ -79,10 +83,10 @@ function MoviesList() {
     const y = (event.clientY - rect.top) / rect.height - 0.5;
 
     card.classList.add("is-hovering");
-    card.style.setProperty("--rotate-x", `${-y * 26}deg`);
-    card.style.setProperty("--rotate-y", `${x * 26}deg`);
-    card.style.setProperty("--image-x", `${-x * 52}px`);
-    card.style.setProperty("--image-y", `${-y * 52}px`);
+    card.style.setProperty("--rotate-x", `${-y * 4}deg`);
+    card.style.setProperty("--rotate-y", `${x * 8}deg`);
+    card.style.setProperty("--image-x", `${-x * 8}px`);
+    card.style.setProperty("--image-y", `${-y * 4}px`);
   }
 
   function handleCardMouseLeave(event) {
@@ -97,7 +101,8 @@ function MoviesList() {
 
   function handleSearchSubmit(event) {
     event.preventDefault();
-    resetResults(searchTerm.trim());
+    setActiveSearch(searchTerm.trim());
+    window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
   useEffect(() => {
@@ -108,12 +113,7 @@ function MoviesList() {
 
     let requestUrl = "";
 
-    if (searchQuery) {
-      requestUrl = tmdbUrl(`/search/${isTv ? "tv" : "movie"}`, {
-        page,
-        query: searchQuery
-      });
-    } else if (category === "popular") {
+    if (category === "popular") {
       requestUrl = tmdbUrl(isTv ? "/tv/popular" : "/movie/popular", { page });
     } else if (category === "trending") {
       requestUrl = tmdbUrl(`/trending/${isTv ? "tv" : "movie"}/week`, { page });
@@ -150,7 +150,7 @@ function MoviesList() {
     return () => {
       cancelled = true;
     };
-  }, [page, category, genre, isTv, searchQuery]);
+  }, [page, category, genre, isTv]);
 
   useEffect(() => {
     function handleScroll() {
@@ -179,7 +179,7 @@ function MoviesList() {
   }
 
   function getTitle(item) {
-    return item.title || item.name;
+    return item.title || item.name || "";
   }
 
   function getReleaseYear(item) {

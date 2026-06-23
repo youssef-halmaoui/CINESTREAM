@@ -138,7 +138,7 @@ function TVDetails() {
               onClick={handleFavoriteClick}
             >
               {currentUser
-                ? favoriteSaved ? "✓ In Favorite List" : "+ Add to Favorite List"
+                ? favoriteSaved ? "Saved in Favorite List" : "+ Add to Favorite List"
                 : "Sign in to Favorite"}
             </button>
           </div>

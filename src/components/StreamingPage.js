@@ -111,7 +111,7 @@ function StreamingPage() {
 
         <section className="stream-section server-section">
           <div className="server-heading">
-            <h2><span aria-hidden="true">⚡</span> Automatic servers</h2>
+            <h2>Automatic servers</h2>
             <p>External sources generated automatically.</p>
           </div>
           <div className="server-grid">
@@ -122,7 +122,7 @@ function StreamingPage() {
                 key={server.id}
                 onClick={() => setActiveServerId(server.id)}
               >
-                <span className="server-play" aria-hidden="true">▷</span>
+                <span className="server-play" aria-hidden="true">Play</span>
                 <strong>{server.name}</strong>
               </button>
             ))}
