@@ -1,5 +1,5 @@
 import axios from "axios";
-import { useCallback, useState, useEffect, useRef } from "react";
+import { useCallback, useState, useEffect } from "react";
 import { useNavigate , Link} from "react-router-dom";
 import { tmdbUrl } from "../config";
 import { getCurrentUser, getFavorites, logoutUser } from "../services/auth";
@@ -55,7 +55,6 @@ function MoviesList() {
   const [genre, setGenre] = useState("");
   const [browseError, setBrowseError] = useState("");
   const [currentUser, setCurrentUser] = useState(() => getCurrentUser());
-  const didMountSearchRef = useRef(false);
   const navigate = useNavigate();
   const favorites = currentUser ? getFavorites(currentUser.id) : [];
   const heroMovie = Movies[0];
@@ -94,6 +93,11 @@ function MoviesList() {
     card.style.setProperty("--rotate-y", "0deg");
     card.style.setProperty("--image-x", "0px");
     card.style.setProperty("--image-y", "0px");
+  }
+
+  function handleSearchSubmit(event) {
+    event.preventDefault();
+    resetResults(searchTerm.trim());
   }
 
   useEffect(() => {
@@ -147,21 +151,6 @@ function MoviesList() {
       cancelled = true;
     };
   }, [page, category, genre, isTv, searchQuery]);
-
-  useEffect(() => {
-    if (!didMountSearchRef.current) {
-      didMountSearchRef.current = true;
-      return undefined;
-    }
-
-    const timeoutId = window.setTimeout(() => {
-      resetResults(searchTerm.trim());
-    }, 350);
-
-    return () => {
-      window.clearTimeout(timeoutId);
-    };
-  }, [resetResults, searchTerm]);
 
   useEffect(() => {
     function handleScroll() {
@@ -234,7 +223,7 @@ function MoviesList() {
       </header>
 
       <section className="browse-toolbar" aria-label="Browse filters">
-        <div className="browse-search">
+        <form className="browse-search" onSubmit={handleSearchSubmit}>
           <input
             type="search"
             value={searchTerm}
@@ -242,7 +231,8 @@ function MoviesList() {
             placeholder="Search by name..."
             aria-label="Search by name"
           />
-        </div>
+          <button type="submit">Search</button>
+        </form>
         <div className="browse-filters">
           <select
             value={mediaType}
