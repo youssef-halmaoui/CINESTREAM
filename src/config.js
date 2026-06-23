@@ -1,5 +1,5 @@
 export const TMDB_API_KEY = "e8caad2d9f38c772cf6b62242ef35237";
-export const NEXSTREAM_API_KEY = "nx_789af32713731ca9830a175c6eb3ee58";
+export const NEXSTREAM_API_KEY = "nx_5fb844c597eef26e906d08a26f9e290b";
 export const NEXSTREAM_BASE_URL = "https://api.codespecters.com";
 
 export const STREAM_SERVERS = [
