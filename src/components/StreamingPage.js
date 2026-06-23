@@ -2,6 +2,7 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { STREAM_SERVERS, tmdbUrl } from "../config";
+import SiteLogo from "./SiteLogo";
 import "./StreamingPage.css";
 
 function StreamingPage() {
@@ -72,7 +73,9 @@ function StreamingPage() {
   return (
     <div className="stream-page">
       <header className="stream-header">
-        <Link to="/Movies" className="stream-brand">CINESTREAM</Link>
+        <Link to="/Movies" className="stream-brand">
+          <SiteLogo />
+        </Link>
         <nav className="stream-nav" aria-label="Main navigation">
           <Link to="/Movies">Movies</Link>
           {!isEpisode && <Link to={`/Movies/${media.id}/Details`}>Details</Link>}

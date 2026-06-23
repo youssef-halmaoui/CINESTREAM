@@ -23,6 +23,9 @@
 }
 
 .auth-brand {
+  display: inline-flex;
+  align-items: center;
+  flex: 0 0 auto;
   color: #f20d18;
   font-size: 28px;
   font-weight: 900;

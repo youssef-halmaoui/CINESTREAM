@@ -35,9 +35,13 @@ button {
 }
 
 .brand {
+  display: inline-flex;
+  align-items: center;
+  flex: 0 0 auto;
   color: #f20d18;
   font-size: 22px;
   font-weight: 900;
+  text-decoration: none;
 }
 
 .main-nav {

@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { tmdbUrl } from "../config";
 import { getCurrentUser, isFavorite, toggleFavorite } from "../services/auth";
+import SiteLogo from "./SiteLogo";
 import "./TVDetails.css";
 
 function TVDetails() {
@@ -98,7 +99,9 @@ function TVDetails() {
   return (
     <div className="tv-page">
       <header className="tv-header">
-        <Link to="/Movies" className="tv-brand">CINESTREAM</Link>
+        <Link to="/Movies" className="tv-brand">
+          <SiteLogo />
+        </Link>
         <nav className="tv-nav" aria-label="Main navigation">
           <Link to="/Movies">Browse</Link>
           {currentUser && <Link to="/Movies#favorites">My List</Link>}

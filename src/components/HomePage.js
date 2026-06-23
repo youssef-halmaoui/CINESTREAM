@@ -1,6 +1,7 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import SiteLogo from "./SiteLogo";
 import "./HomePage.css";
 
 const API_KEY = "e8caad2d9f38c772cf6b62242ef35237";
@@ -24,7 +25,9 @@ function HomePage() {
   return (
     <div className="home-page">
       <header className="home-header">
-        <Link to="/" className="home-brand">CINESTREAM</Link>
+        <Link to="/" className="home-brand">
+          <SiteLogo />
+        </Link>
         <nav className="home-nav" aria-label="Main navigation">
           <Link to="/Movies" className="active">Home</Link>
           <Link to="/Movies">Movies</Link>

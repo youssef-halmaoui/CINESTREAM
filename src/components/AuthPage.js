@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { loginUser, registerUser } from "../services/auth";
+import SiteLogo from "./SiteLogo";
 import "./AuthPage.css";
 
 function AuthPage({ mode = "login" }) {
@@ -43,7 +44,9 @@ function AuthPage({ mode = "login" }) {
   return (
     <div className={isRegister ? "auth-page register-page" : "auth-page login-page"}>
       <header className="auth-header">
-        <Link to="/" className="auth-brand">CINESTREAM</Link>
+        <Link to="/" className="auth-brand">
+          <SiteLogo />
+        </Link>
         <nav className="auth-nav">
           <Link to="/">Home</Link>
           <Link to="/Movies">Movies</Link>

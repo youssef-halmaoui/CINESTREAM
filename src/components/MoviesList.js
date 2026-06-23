@@ -3,6 +3,7 @@ import { useCallback, useState, useEffect } from "react";
 import { useNavigate , Link} from "react-router-dom";
 import { tmdbUrl } from "../config";
 import { getCurrentUser, getFavorites, logoutUser } from "../services/auth";
+import SiteLogo from "./SiteLogo";
 import "./MoviesList.css";
 
 const movieGenres = [
@@ -190,8 +191,8 @@ function MoviesList() {
   return (
     <div className="movies-page">
       <header className="movies-header">
-        <Link to={'/'} style={{textDecoration : "none"}}>
-            <div className="brand">CINESTREAM</div>
+        <Link to="/" className="brand">
+          <SiteLogo />
         </Link>
         <nav className="main-nav" aria-label="Main navigation">
           <a href="/">Home</a>

@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { tmdbUrl } from "../config";
 import { getCurrentUser, isFavorite, toggleFavorite } from "../services/auth";
+import SiteLogo from "./SiteLogo";
 import "./MovieDetails.css";
 
 function getRatingColor(rating) {
@@ -185,7 +186,9 @@ function MovieDetails() {
   return (
     <div className="details-page">
       <header className="details-header">
-        <Link to="/Movies" className="details-brand">CINESTREAM</Link>
+        <Link to="/Movies" className="details-brand">
+          <SiteLogo />
+        </Link>
         <nav className="details-nav" aria-label="Main navigation">
           <Link to="/Movies" className="active">Home</Link>
           <Link to="/Movies">Movies</Link>
