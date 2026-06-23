@@ -10,6 +10,7 @@ function StreamingPage() {
   const navigate = useNavigate();
   const [media, setMedia] = useState(null);
   const [recommendations, setRecommendations] = useState([]);
+  const [seasonEpisodes, setSeasonEpisodes] = useState([]);
   const [activeServerId, setActiveServerId] = useState(STREAM_SERVERS[0].id);
   const [error, setError] = useState("");
   const isEpisode = Boolean(seasonNumber && episodeNumber);
@@ -22,6 +23,7 @@ function StreamingPage() {
 
     setMedia(null);
     setRecommendations([]);
+    setSeasonEpisodes([]);
     setError("");
 
     const detailsUrl = isEpisode
@@ -30,15 +32,20 @@ function StreamingPage() {
     const recommendationsUrl = isEpisode
       ? tmdbUrl(`/tv/${id}/recommendations`)
       : tmdbUrl(`/movie/${id}/recommendations`);
+    const seasonUrl = isEpisode ? tmdbUrl(`/tv/${id}/season/${seasonNumber}`) : null;
 
     axios
       .all([
         axios.get(detailsUrl),
-        axios.get(recommendationsUrl)
+        axios.get(recommendationsUrl),
+        seasonUrl
+          ? axios.get(seasonUrl).catch(() => ({ data: { episodes: [] } }))
+          : Promise.resolve({ data: { episodes: [] } })
       ])
-      .then(axios.spread((detailsRes, recommendationsRes) => {
+      .then(axios.spread((detailsRes, recommendationsRes, seasonRes) => {
         setMedia(detailsRes.data);
         setRecommendations(recommendationsRes.data.results || []);
+        setSeasonEpisodes(seasonRes.data.episodes || []);
       }))
       .catch(() => {
         setError("Stream could not be loaded.");
@@ -64,6 +71,15 @@ function StreamingPage() {
   const runtimeHours = Math.floor((media.runtime || 0) / 60);
   const runtimeMinutes = (media.runtime || 0) % 60;
   const runtimeText = media.runtime ? `${runtimeHours}h ${runtimeMinutes}m` : "Runtime unavailable";
+  const currentEpisodeNumber = Number(episodeNumber);
+  const currentEpisodeIndex = seasonEpisodes.findIndex(
+    (episode) => episode.episode_number === currentEpisodeNumber
+  );
+  const previousEpisode = currentEpisodeIndex > 0 ? seasonEpisodes[currentEpisodeIndex - 1] : null;
+  const nextEpisode =
+    currentEpisodeIndex >= 0 && currentEpisodeIndex < seasonEpisodes.length - 1
+      ? seasonEpisodes[currentEpisodeIndex + 1]
+      : null;
   const activeServer =
     STREAM_SERVERS.find((server) => server.id === activeServerId) || STREAM_SERVERS[0];
   const streamUrl = isEpisode
@@ -85,14 +101,44 @@ function StreamingPage() {
 
       <main className="stream-main">
         <section className="stream-player-section">
-          <div className="stream-player">
-            <iframe
-              key={activeServer.id}
-              src={streamUrl}
-              title={`${title} stream`}
-              allow="autoplay; fullscreen; encrypted-media; picture-in-picture"
-              allowFullScreen
-            />
+          <div className="stream-player-wrap">
+            <div className="stream-player">
+              <iframe
+                key={activeServer.id}
+                src={streamUrl}
+                title={`${title} stream`}
+                allow="autoplay; fullscreen; encrypted-media; picture-in-picture"
+                allowFullScreen
+              />
+            </div>
+            {isEpisode && (
+              <div className="episode-nav-buttons" aria-label="Episode navigation">
+                <button
+                  type="button"
+                  className="episode-nav-button prev"
+                  disabled={!previousEpisode}
+                  onClick={() =>
+                    previousEpisode &&
+                    navigate(`/TV/${id}/Season/${seasonNumber}/Episode/${previousEpisode.episode_number}/Watch`)
+                  }
+                >
+                  <span>Prev</span>
+                  <strong aria-hidden="true">&laquo;</strong>
+                </button>
+                <button
+                  type="button"
+                  className="episode-nav-button next"
+                  disabled={!nextEpisode}
+                  onClick={() =>
+                    nextEpisode &&
+                    navigate(`/TV/${id}/Season/${seasonNumber}/Episode/${nextEpisode.episode_number}/Watch`)
+                  }
+                >
+                  <strong aria-hidden="true">&raquo;</strong>
+                  <span>Next</span>
+                </button>
+              </div>
+            )}
           </div>
 
           <div className="stream-info">
@@ -131,6 +177,50 @@ function StreamingPage() {
             ))}
           </div>
         </section>
+
+        {isEpisode && (
+          <section className="stream-section episode-list-section">
+            <div className="episode-list-heading">
+              <h2>All episodes</h2>
+              <span>Season {seasonNumber}</span>
+            </div>
+            <div className="watch-episode-grid">
+              {seasonEpisodes.map((episode) => (
+                <button
+                  type="button"
+                  className={
+                    episode.episode_number === currentEpisodeNumber
+                      ? "watch-episode-card active"
+                      : "watch-episode-card"
+                  }
+                  key={episode.id || episode.episode_number}
+                  onClick={() =>
+                    navigate(`/TV/${id}/Season/${seasonNumber}/Episode/${episode.episode_number}/Watch`)
+                  }
+                >
+                  <div className="watch-episode-art">
+                    {episode.still_path ? (
+                      <img
+                        src={`https://image.tmdb.org/t/p/w500${episode.still_path}`}
+                        alt={episode.name || `Episode ${episode.episode_number}`}
+                      />
+                    ) : (
+                      <span>Episode {episode.episode_number}</span>
+                    )}
+                    <strong>Ep {episode.episode_number}</strong>
+                  </div>
+                  <div className="watch-episode-copy">
+                    <h3>{episode.name || `Episode ${episode.episode_number}`}</h3>
+                    <p>{episode.overview || "No episode overview available."}</p>
+                  </div>
+                </button>
+              ))}
+              {seasonEpisodes.length === 0 && (
+                <p className="stream-empty">No episodes available for this season.</p>
+              )}
+            </div>
+          </section>
+        )}
 
         <section className="stream-section">
           <h2>Watch Next</h2>

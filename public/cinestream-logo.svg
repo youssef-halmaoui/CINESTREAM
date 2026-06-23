@@ -1,60 +1,73 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 620 180" role="img" aria-labelledby="title desc">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 150" role="img" aria-labelledby="title desc">
   <title id="title">CineStream logo</title>
-  <desc id="desc">A red film reel with a play icon and the CineStream wordmark.</desc>
+  <desc id="desc">A red movie reel with a white play icon and the CineStream wordmark.</desc>
   <defs>
-    <radialGradient id="reelGlow" cx="36%" cy="32%" r="70%">
-      <stop offset="0" stop-color="#ff5a5f"/>
-      <stop offset="0.42" stop-color="#df151f"/>
-      <stop offset="1" stop-color="#76070d"/>
+    <radialGradient id="reelRed" cx="35%" cy="28%" r="76%">
+      <stop offset="0" stop-color="#ff6765"/>
+      <stop offset="0.24" stop-color="#ff1d27"/>
+      <stop offset="0.7" stop-color="#d30b14"/>
+      <stop offset="1" stop-color="#5e0207"/>
     </radialGradient>
-    <linearGradient id="filmStrip" x1="58" x2="152" y1="112" y2="142" gradientUnits="userSpaceOnUse">
-      <stop offset="0" stop-color="#f8f8f8"/>
-      <stop offset="0.5" stop-color="#777"/>
-      <stop offset="1" stop-color="#151515"/>
+    <linearGradient id="rimRed" x1="36" x2="155" y1="42" y2="125" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#ff2b31"/>
+      <stop offset="0.56" stop-color="#a9050b"/>
+      <stop offset="1" stop-color="#3b0204"/>
     </linearGradient>
-    <linearGradient id="wordWhite" x1="180" x2="318" y1="54" y2="122" gradientUnits="userSpaceOnUse">
-      <stop offset="0" stop-color="#ffffff"/>
-      <stop offset="0.52" stop-color="#e9e9e9"/>
-      <stop offset="1" stop-color="#8f8f8f"/>
+    <linearGradient id="filmBand" x1="38" x2="168" y1="101" y2="91" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#ededed"/>
+      <stop offset="0.42" stop-color="#b9b9b9"/>
+      <stop offset="0.72" stop-color="#5a5a5a"/>
+      <stop offset="1" stop-color="#141414"/>
     </linearGradient>
-    <linearGradient id="wordRed" x1="340" x2="552" y1="52" y2="126" gradientUnits="userSpaceOnUse">
-      <stop offset="0" stop-color="#ff554f"/>
-      <stop offset="0.48" stop-color="#f20d18"/>
+    <linearGradient id="playFace" x1="73" x2="110" y1="62" y2="102" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#fff"/>
+      <stop offset="0.64" stop-color="#edf1f4"/>
+      <stop offset="1" stop-color="#aeb5bd"/>
+    </linearGradient>
+    <linearGradient id="cineText" x1="129" x2="235" y1="46" y2="105" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#fff"/>
+      <stop offset="0.55" stop-color="#e6e6e6"/>
+      <stop offset="1" stop-color="#929292"/>
+    </linearGradient>
+    <linearGradient id="streamText" x1="235" x2="404" y1="46" y2="108" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#ff625b"/>
+      <stop offset="0.5" stop-color="#f20d18"/>
       <stop offset="1" stop-color="#b90912"/>
     </linearGradient>
     <filter id="softShadow" x="-20%" y="-40%" width="140%" height="180%">
-      <feDropShadow dx="0" dy="12" stdDeviation="12" flood-color="#000" flood-opacity="0.72"/>
+      <feDropShadow dx="0" dy="9" stdDeviation="9" flood-color="#000" flood-opacity="0.75"/>
     </filter>
     <filter id="redDust" x="-40%" y="-40%" width="180%" height="180%">
-      <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" seed="8" result="noise"/>
-      <feColorMatrix in="noise" type="matrix" values="1 0 0 0 0.95 0 0 0 0 0.1 0 0 0 0 0.05 0 0 0 .32 0"/>
-      <feGaussianBlur stdDeviation="0.25"/>
+      <feTurbulence type="fractalNoise" baseFrequency="0.95" numOctaves="2" seed="8" result="noise"/>
+      <feColorMatrix in="noise" type="matrix" values="1 0 0 0 0.95 0 0 0 0 0.08 0 0 0 0 0.04 0 0 0 .24 0"/>
+      <feGaussianBlur stdDeviation="0.3"/>
     </filter>
   </defs>
 
-  <rect width="620" height="180" fill="transparent"/>
-  <ellipse cx="170" cy="132" rx="148" ry="34" fill="#f20d18" opacity="0.2" filter="url(#redDust)"/>
+  <rect width="500" height="150" fill="transparent"/>
+  <ellipse cx="155" cy="124" rx="130" ry="28" fill="#f20d18" opacity="0.18" filter="url(#redDust)"/>
 
   <g filter="url(#softShadow)">
-    <circle cx="93" cy="88" r="61" fill="url(#reelGlow)"/>
-    <circle cx="93" cy="88" r="61" fill="none" stroke="#260204" stroke-width="5"/>
-    <circle cx="93" cy="88" r="27" fill="#090909" opacity="0.92"/>
+    <ellipse cx="92" cy="78" rx="68" ry="54" transform="rotate(-12 92 78)" fill="url(#rimRed)"/>
+    <ellipse cx="78" cy="72" rx="57" ry="50" transform="rotate(-12 78 72)" fill="url(#reelRed)" stroke="#140102" stroke-width="4"/>
 
-    <ellipse cx="61" cy="58" rx="12" ry="17" transform="rotate(18 61 58)" fill="#050505"/>
-    <ellipse cx="96" cy="48" rx="12" ry="17" transform="rotate(-24 96 48)" fill="#050505"/>
-    <ellipse cx="130" cy="66" rx="12" ry="17" transform="rotate(-35 130 66)" fill="#050505"/>
-    <ellipse cx="129" cy="108" rx="12" ry="17" transform="rotate(22 129 108)" fill="#050505"/>
-    <ellipse cx="71" cy="116" rx="12" ry="17" transform="rotate(-35 71 116)" fill="#050505"/>
+    <ellipse cx="50" cy="56" rx="10" ry="16" transform="rotate(12 50 56)" fill="#050505"/>
+    <ellipse cx="82" cy="42" rx="12" ry="17" transform="rotate(-8 82 42)" fill="#050505"/>
+    <ellipse cx="119" cy="65" rx="11" ry="17" transform="rotate(-26 119 65)" fill="#050505"/>
+    <ellipse cx="45" cy="92" rx="11" ry="17" transform="rotate(-26 45 92)" fill="#050505"/>
 
-    <path d="M76 67v50l49-25z" fill="#f7f7f7" stroke="#060606" stroke-width="5" stroke-linejoin="round"/>
-    <path d="M48 117c35 17 76 22 114 11l-13 26c-40 11-82 4-116-15z" fill="url(#filmStrip)" stroke="#090909" stroke-width="4" stroke-linejoin="round"/>
-    <path d="M58 126l8 4M82 133l8 3M106 137l8 2M131 135l8-1" stroke="#111" stroke-width="7" stroke-linecap="round"/>
+    <path d="M67 58c-4-3-9 0-9 6v43c0 6 7 9 12 5l39-25c5-3 5-10 0-13z" fill="url(#playFace)" stroke="#202020" stroke-width="4" stroke-linejoin="round"/>
+
+    <path d="M35 103c34 21 86 26 136-14l-9 26c-44 34-98 31-130 8z" fill="url(#filmBand)" stroke="#0b0b0b" stroke-width="4" stroke-linejoin="round"/>
+    <path d="M38 108c34 19 86 22 128-12" fill="none" stroke="#f4f4f4" stroke-width="3" opacity="0.78"/>
+    <path d="M50 116l6 14M69 121l4 14M91 124l3 14M113 122l-1 13M134 115l-4 13" stroke="#111" stroke-width="6" stroke-linecap="round"/>
+    <path d="M55 27c22-12 57-12 80 7" fill="none" stroke="#ff8587" stroke-width="3" stroke-linecap="round" opacity="0.9"/>
   </g>
 
   <g filter="url(#softShadow)" font-family="Arial, Helvetica, sans-serif" font-style="italic" font-weight="900">
-    <text x="166" y="108" fill="#111" opacity="0.78" font-size="70" stroke="#111" stroke-width="8">Cine</text>
-    <text x="164" y="106" fill="url(#wordWhite)" font-size="70" stroke="#2a2a2a" stroke-width="1.5">Cine</text>
-    <text x="319" y="108" fill="#111" opacity="0.78" font-size="70" stroke="#111" stroke-width="8">Stream</text>
-    <text x="316" y="106" fill="url(#wordRed)" font-size="70">Stream</text>
+    <text x="124" y="94" fill="#111" opacity="0.78" font-size="58" stroke="#111" stroke-width="7">Cine</text>
+    <text x="122" y="92" fill="url(#cineText)" font-size="58" stroke="#2c2c2c" stroke-width="1.1">Cine</text>
+    <text x="232" y="94" fill="#111" opacity="0.78" font-size="58" stroke="#111" stroke-width="7">Stream</text>
+    <text x="230" y="92" fill="url(#streamText)" font-size="58">Stream</text>
   </g>
 </svg>

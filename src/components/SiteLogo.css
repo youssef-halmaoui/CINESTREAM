@@ -1,14 +1,14 @@
 .site-logo {
   display: block;
-  width: clamp(150px, 18vw, 214px);
-  height: 54px;
+  width: clamp(188px, 22vw, 270px);
+  height: 58px;
   object-fit: contain;
   object-position: left center;
 }
 
 @media (max-width: 640px) {
   .site-logo {
-    width: 148px;
-    height: 42px;
+    width: 154px;
+    height: 44px;
   }
 }
