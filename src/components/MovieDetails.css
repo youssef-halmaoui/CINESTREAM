@@ -46,40 +46,47 @@ body {
 .details-nav {
   display: flex;
   align-items: center;
-  gap: 34px;
-  flex: 1;
+  gap: 28px;
 }
 
 .details-nav a {
-  color: #f2d3cf;
-  font-size: 16px;
-  font-weight: 700;
+  color: rgba(255, 255, 255, 0.78);
+  font-size: 15px;
+  font-weight: 800;
   text-decoration: none;
+  transition: color 0.2s ease;
+  border-bottom: 2px solid transparent;
+  padding-bottom: 8px;
+}
+
+.details-nav a:hover {
+  color: #fff;
 }
 
 .details-nav a.active {
-  color: #ffd0cc;
-  border-bottom: 2px solid #ffd0cc;
-  padding-bottom: 8px;
+  color: #fff;
+  border-bottom-color: #f20d18;
 }
 
 .details-actions {
   display: flex;
   align-items: center;
   gap: 20px;
+  margin-left: auto;
 }
 
-.details-actions button {
+.details-actions .profile-avatar {
   display: grid;
   place-items: center;
-  width: 32px;
-  height: 32px;
-  color: #ffd0cc;
-  background: transparent;
-  border: 0;
-  font-size: 14px;
+  width: 36px;
+  height: 36px;
+  background: linear-gradient(145deg, #0f8794, #1b2028);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-radius: 8px;
+  font-size: 15px;
   font-weight: 900;
-  cursor: pointer;
+  color: #fff;
+  cursor: default;
 }
 
 .details-main {

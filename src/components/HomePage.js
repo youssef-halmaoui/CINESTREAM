@@ -29,13 +29,10 @@ function HomePage() {
           <SiteLogo />
         </Link>
         <nav className="home-nav" aria-label="Main navigation">
-          <Link to="/Movies" className="active">Home</Link>
           <Link to="/Movies">Movies</Link>
-          <Link to="/Movies">TV Shows</Link>
           <Link to="/Movies">My List</Link>
         </nav>
         <div className="home-actions">
-          <button type="button" aria-label="Search">Search</button>
           <button type="button" className="signin-button">Sign In</button>
           <button type="button" className="join-button" onClick={() => navigate("/Movies")}>
             Join Now

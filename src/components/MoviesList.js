@@ -1,5 +1,5 @@
 import axios from "axios";
-import { useCallback, useState, useEffect } from "react";
+import { useCallback, useState, useEffect, useRef } from "react";
 import { useNavigate , Link} from "react-router-dom";
 import { tmdbUrl } from "../config";
 import { getCurrentUser, getFavorites, logoutUser } from "../services/auth";
@@ -45,6 +45,62 @@ function getRatingColor(rating) {
   return "#f97316";
 }
 
+function Dropdown({ value, options, onChange, ariaLabel }) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef(null);
+  const selected = options.find((o) => o.value === value) || options[0];
+
+  useEffect(() => {
+    function handleClickOutside(e) {
+      if (ref.current && !ref.current.contains(e.target)) {
+        setOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  return (
+    <div className={`custom-dropdown${open ? " is-open" : ""}`} ref={ref} aria-label={ariaLabel}>
+      <button
+        type="button"
+        className="dropdown-trigger"
+        onClick={() => setOpen((prev) => !prev)}
+        aria-haspopup="listbox"
+        aria-expanded={open}
+      >
+        <span className="dropdown-label">{selected.label}</span>
+        <svg className="dropdown-chevron" width="12" height="8" viewBox="0 0 12 8" fill="none">
+          <path d="M1 1l5 5 5-5" stroke="#f20d18" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+        </svg>
+      </button>
+      {open && (
+        <ul className="dropdown-panel" role="listbox">
+          {options.map((opt) => (
+            <li
+              key={opt.value || "all"}
+              role="option"
+              aria-selected={opt.value === value}
+              className={`dropdown-option${opt.value === value ? " is-active" : ""}`}
+              onClick={() => {
+                onChange(opt.value);
+                setOpen(false);
+              }}
+            >
+              {opt.value === value && (
+                <svg className="option-check" width="12" height="9" viewBox="0 0 12 9" fill="none">
+                  <path d="M1 4l3.5 3.5L11 1" stroke="#f20d18" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+              )}
+              {opt.label}
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
+}
+
 function MoviesList() {
   const [Movies, SetMovies] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -63,9 +119,7 @@ function MoviesList() {
   const titleLabel = isTv ? "Series" : "Movies";
   const searchQuery = activeSearch.trim();
   const normalizedSearch = searchQuery.toLowerCase();
-  const visibleMovies = normalizedSearch
-    ? Movies.filter((movie) => getTitle(movie).toLowerCase().includes(normalizedSearch))
-    : Movies;
+  const visibleMovies = Movies;
   const heroMovie = visibleMovies[0];
   const trendingMovies = visibleMovies.slice(1, 6);
   const popularMovies = visibleMovies.slice(6);
@@ -102,8 +156,7 @@ function MoviesList() {
 
   function handleSearchSubmit(event) {
     event.preventDefault();
-    setActiveSearch(searchTerm.trim());
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    resetResults(searchTerm.trim());
   }
 
   useEffect(() => {
@@ -114,7 +167,12 @@ function MoviesList() {
 
     let requestUrl = "";
 
-    if (category === "popular") {
+    if (activeSearch) {
+      requestUrl = tmdbUrl(isTv ? "/search/tv" : "/search/movie", {
+        query: activeSearch,
+        page
+      });
+    } else if (category === "popular") {
       requestUrl = tmdbUrl(isTv ? "/tv/popular" : "/movie/popular", { page });
     } else if (category === "trending") {
       requestUrl = tmdbUrl(`/trending/${isTv ? "tv" : "movie"}/week`, { page });
@@ -151,7 +209,7 @@ function MoviesList() {
     return () => {
       cancelled = true;
     };
-  }, [page, category, genre, isTv]);
+  }, [page, category, genre, isTv, activeSearch]);
 
   useEffect(() => {
     function handleScroll() {
@@ -195,9 +253,7 @@ function MoviesList() {
           <SiteLogo />
         </Link>
         <nav className="main-nav" aria-label="Main navigation">
-          <a href="/">Home</a>
           <a href="#movies" className="active">Movies</a>
-          <a href="#shows">TV Shows</a>
           {currentUser && <a href="#favorites">My List</a>}
         </nav>
         <div className="header-actions">
@@ -209,6 +265,7 @@ function MoviesList() {
                 onClick={() => {
                   logoutUser();
                   setCurrentUser(null);
+                  navigate("/");
                 }}
               >
                 Sign Out
@@ -235,51 +292,51 @@ function MoviesList() {
           <button type="submit">Search</button>
         </form>
         <div className="browse-filters">
-          <select
+          <Dropdown
+            ariaLabel="Media type"
             value={mediaType}
-            onChange={(event) => {
-              setMediaType(event.target.value);
+            options={[
+              { value: "movie", label: "🎬  Movies" },
+              { value: "tv",    label: "📺  Series" }
+            ]}
+            onChange={(val) => {
+              setMediaType(val);
               setGenre("");
-              resetResults();
+              SetMovies([]);
+              setPage(1);
             }}
-            aria-label="Media type"
-          >
-            <option value="movie">Movies</option>
-            <option value="tv">Series</option>
-          </select>
-          <select
+          />
+          <Dropdown
+            ariaLabel="Category"
             value={category}
-            onChange={(event) => {
-              setCategory(event.target.value);
-              resetResults();
+            options={[
+              { value: "popular",   label: "🔥  Popular" },
+              { value: "trending",  label: "📈  Trending" },
+              { value: "top-rated", label: "⭐  Top Rated" },
+              { value: "upcoming",  label: "🗓  Upcoming" },
+              { value: "discover",  label: "🎯  All / By Genre" }
+            ]}
+            onChange={(val) => {
+              setCategory(val);
+              setSearchTerm("");
+              resetResults("");
             }}
-            aria-label="Category"
-          >
-            <option value="popular">Popular</option>
-            <option value="trending">Trending</option>
-            <option value="top-rated">Top Rated</option>
-            <option value="upcoming">Upcoming</option>
-            <option value="discover">All / By Genre</option>
-          </select>
-          <select
+          />
+          <Dropdown
+            ariaLabel="Genre"
             value={genre}
-            onChange={(event) => {
-              setGenre(event.target.value);
+            options={activeGenres.map((g) => ({ value: g.id, label: g.name }))}
+            onChange={(val) => {
+              setGenre(val);
               setCategory("discover");
-              resetResults();
+              setSearchTerm("");
+              resetResults("");
             }}
-            aria-label="Genre"
-          >
-            {activeGenres.map((item) => (
-              <option key={item.id || "all"} value={item.id}>
-                {item.name}
-              </option>
-            ))}
-          </select>
+          />
         </div>
       </section>
 
-      {heroMovie && (
+      {!searchQuery && heroMovie && (
         <section
           id="movies-hero"
           className="hero-section"
@@ -344,92 +401,113 @@ function MoviesList() {
           </section>
         )}
 
-        {/* <section className="continue-section" aria-labelledby="continue-title">
-          <h2 id="continue-title">Continue Watching</h2>
-          <div className="continue-row">
-            {trendingMovies.slice(0, 2).map((movie) => (
-              <button
-                type="button"
-                className="wide-movie-card"
-                key={movie.id}
-                onClick={() => navigate(`/Movies/${movie.id}/Details`)}
-              >
-                <img
-                  src={movie.backdrop_path ? `https://image.tmdb.org/t/p/w500${movie.backdrop_path}` : `https://image.tmdb.org/t/p/w300${movie.poster_path}`}
-                  alt={movie.title}
-                />
-                <span>{movie.title}</span>
-                <small>Rating {movie.vote_average?.toFixed(1)}</small>
-              </button>
-            ))}
-          </div>
-        </section> */}
+        {searchQuery ? (
+          <section id="search-results" className="movie-section" aria-labelledby="search-results-title">
+            <div className="section-heading">
+              <h2 id="search-results-title">Search Results for "{searchQuery}"</h2>
+            </div>
+            {Movies.length > 0 ? (
+              <div className="poster-grid">
+                {Movies.map((movie) => (
+                  <button
+                    type="button"
+                    className="poster-card"
+                    key={movie.id}
+                    onClick={() => openTitle(movie)}
+                    onMouseMove={handleCardMouseMove}
+                    onMouseLeave={handleCardMouseLeave}
+                  >
+                    <div className="parallax-card-frame">
+                      <img
+                        src={movie.poster_path ? `https://image.tmdb.org/t/p/w342${movie.poster_path}` : ""}
+                        alt={getTitle(movie)}
+                      />
+                      <div className="movie-card-badges">
+                        <span>{getReleaseYear(movie)}</span>
+                        <span style={{ backgroundColor: getRatingColor(movie.vote_average || 0) }}>
+                          {(movie.vote_average || 0).toFixed(1)}
+                        </span>
+                      </div>
+                    </div>
+                    <strong>{getTitle(movie)}</strong>
+                    <small>{movie.release_date || movie.first_air_date || "Now Streaming"}</small>
+                  </button>
+                ))}
+              </div>
+            ) : (
+              !loading && <p className="loading-text">No results found for "{searchQuery}".</p>
+            )}
+          </section>
+        ) : (
+          <>
+            <section id="movies" className="movie-section" aria-labelledby="trending-title">
+              <div className="section-heading">
+                <h2 id="trending-title">Featured {titleLabel}</h2>
+                <button type="button">View All</button>
+              </div>
+              <div className="trending-row">
+                {trendingMovies.map((movie, index) => (
+                  <button
+                    type="button"
+                    className={index === 0 ? "movie-card featured-card" : "movie-card"}
+                    key={movie.id}
+                    onClick={() => openTitle(movie)}
+                    onMouseMove={handleCardMouseMove}
+                    onMouseLeave={handleCardMouseLeave}
+                  >
+                    <div className="parallax-card-frame">
+                      <img
+                        src={movie.poster_path ? `https://image.tmdb.org/t/p/w342${movie.poster_path}` : ""}
+                        alt={getTitle(movie)}
+                      />
+                      <div className="movie-card-badges">
+                        <span>{getReleaseYear(movie)}</span>
+                        <span style={{ backgroundColor: getRatingColor(movie.vote_average || 0) }}>
+                          {(movie.vote_average || 0).toFixed(1)}
+                        </span>
+                      </div>
+                      {index === 0 && <span className="rank">#1</span>}
+                    </div>
+                    <strong>{getTitle(movie)}</strong>
+                    <small>{movie.release_date || movie.first_air_date || "Now Streaming"}</small>
+                  </button>
+                ))}
+              </div>
+            </section>
 
-        <section id="movies" className="movie-section" aria-labelledby="trending-title">
-          <div className="section-heading">
-            <h2 id="trending-title">{searchQuery ? `Search Results for "${searchQuery}"` : `Featured ${titleLabel}`}</h2>
-            <button type="button">View All</button>
-          </div>
-          <div className="trending-row">
-            {trendingMovies.map((movie, index) => (
-              <button
-                type="button"
-                className={index === 0 ? "movie-card featured-card" : "movie-card"}
-                key={movie.id}
-                onClick={() => openTitle(movie)}
-                onMouseMove={handleCardMouseMove}
-                onMouseLeave={handleCardMouseLeave}
-              >
-                <div className="parallax-card-frame">
-                  <img
-                    src={movie.poster_path ? `https://image.tmdb.org/t/p/w342${movie.poster_path}` : ""}
-                    alt={getTitle(movie)}
-                  />
-                  <div className="movie-card-badges">
-                    <span>{getReleaseYear(movie)}</span>
-                    <span style={{ backgroundColor: getRatingColor(movie.vote_average || 0) }}>
-                      {(movie.vote_average || 0).toFixed(1)}
-                    </span>
-                  </div>
-                  {index === 0 && <span className="rank">#1</span>}
-                </div>
-                <strong>{getTitle(movie)}</strong>
-                <small>{movie.release_date || movie.first_air_date || "Now Streaming"}</small>
-              </button>
-            ))}
-          </div>
-        </section>
+            <section id="shows" className="movie-section" aria-labelledby="popular-title">
+              <h2 id="popular-title">{category === "top-rated" ? "Top Rated" : category === "trending" ? "Trending" : category === "upcoming" ? "Upcoming" : "Popular"} {titleLabel}</h2>
+              <div className="poster-grid">
+                {popularMovies.map((movie) => (
+                  <button
+                    type="button"
+                    className="poster-card"
+                    key={movie.id}
+                    onClick={() => openTitle(movie)}
+                    onMouseMove={handleCardMouseMove}
+                    onMouseLeave={handleCardMouseLeave}
+                  >
+                    <div className="parallax-card-frame">
+                      <img
+                        src={movie.poster_path ? `https://image.tmdb.org/t/p/w342${movie.poster_path}` : ""}
+                        alt={getTitle(movie)}
+                      />
+                      <div className="movie-card-badges">
+                        <span>{getReleaseYear(movie)}</span>
+                        <span style={{ backgroundColor: getRatingColor(movie.vote_average || 0) }}>
+                          {(movie.vote_average || 0).toFixed(1)}
+                        </span>
+                      </div>
+                    </div>
+                    <strong>{getTitle(movie)}</strong>
+                    <small>{movie.release_date || movie.first_air_date || "Now Streaming"}</small>
+                  </button>
+                ))}
+              </div>
+            </section>
+          </>
+        )}
 
-        <section id="shows" className="movie-section" aria-labelledby="popular-title">
-          <h2 id="popular-title">{category === "top-rated" ? "Top Rated" : category === "trending" ? "Trending" : category === "upcoming" ? "Upcoming" : "Popular"} {titleLabel}</h2>
-          <div className="poster-grid">
-            {popularMovies.map((movie) => (
-              <button
-                type="button"
-                className="poster-card"
-                key={movie.id}
-                onClick={() => openTitle(movie)}
-                onMouseMove={handleCardMouseMove}
-                onMouseLeave={handleCardMouseLeave}
-              >
-                <div className="parallax-card-frame">
-                  <img
-                    src={movie.poster_path ? `https://image.tmdb.org/t/p/w342${movie.poster_path}` : ""}
-                    alt={getTitle(movie)}
-                  />
-                  <div className="movie-card-badges">
-                    <span>{getReleaseYear(movie)}</span>
-                    <span style={{ backgroundColor: getRatingColor(movie.vote_average || 0) }}>
-                      {(movie.vote_average || 0).toFixed(1)}
-                    </span>
-                  </div>
-                </div>
-                <strong>{getTitle(movie)}</strong>
-                <small>{movie.release_date || movie.first_air_date || "Now Streaming"}</small>
-              </button>
-            ))}
-          </div>
-        </section>
 
         {!loading && Movies.length === 0 && (
           <p className="loading-text">

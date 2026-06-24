@@ -29,7 +29,10 @@ function MovieDetails() {
   const [error, setError] = useState("");
   const [currentUser] = useState(() => getCurrentUser());
   const [favoriteSaved, setFavoriteSaved] = useState(false);
+  const [downloads, setDownloads] = useState([]);
+  const [showDownloads, setShowDownloads] = useState(false);
   const trailerSectionRef = useRef(null);
+  const downloadRef = useRef(null);
 
   useEffect(() => {
     if (!id) {
@@ -49,6 +52,36 @@ function MovieDetails() {
         setError("Movie details could not be loaded.");
       });
   }, [currentUser, id]);
+
+  useEffect(() => {
+    if (movie && movie.imdb_id) {
+      axios
+        .get(`https://yts.mx/api/v2/list_movies.json?query_term=${movie.imdb_id}`)
+        .then((res) => {
+          const ytsMovie = res.data?.data?.movies?.[0];
+          if (ytsMovie && ytsMovie.torrents) {
+            setDownloads(ytsMovie.torrents);
+          } else {
+            setDownloads([]);
+          }
+        })
+        .catch(() => {
+          setDownloads([]);
+        });
+    } else {
+      setDownloads([]);
+    }
+  }, [movie]);
+
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (downloadRef.current && !downloadRef.current.contains(event.target)) {
+        setShowDownloads(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   useEffect(()=>{
     if (!id) {
@@ -186,18 +219,17 @@ function MovieDetails() {
   return (
     <div className="details-page">
       <header className="details-header">
-        <Link to="/Movies" className="details-brand">
+        <Link to="/" className="details-brand">
           <SiteLogo />
         </Link>
         <nav className="details-nav" aria-label="Main navigation">
-          <Link to="/Movies" className="active">Home</Link>
           <Link to="/Movies">Movies</Link>
-          <Link to="/Movies">TV Shows</Link>
-          {currentUser && <Link to="/Movies#favorites">My List</Link>}
+          <Link to={`/Movies/${id}/Details`} className="active">Details</Link>
         </nav>
         <div className="details-actions">
-          <button type="button" aria-label="Search">S</button>
-          <button type="button" aria-label="Profile">P</button>
+          <div className="profile-avatar" aria-label="Profile">
+            {currentUser?.name?.slice(0, 1).toUpperCase() || "U"}
+          </div>
         </div>
       </header>
 
@@ -243,6 +275,32 @@ function MovieDetails() {
                   ? favoriteSaved ? "✓ In Favorite List" : "+ Add to Favorite List"
                   : "Sign in to Favorite"}
               </button>
+              {downloads.length > 0 && (
+                <div className="download-dropdown-container" ref={downloadRef}>
+                  <button
+                    type="button"
+                    className="download-button"
+                    onClick={() => setShowDownloads((prev) => !prev)}
+                  >
+                    📥 Download
+                  </button>
+                  {showDownloads && (
+                    <div className="download-dropdown-menu">
+                      {downloads.map((torrent, idx) => (
+                        <a
+                          key={idx}
+                          href={`magnet:?xt=urn:btih:${torrent.hash}&dn=${encodeURIComponent(movie.title)}`}
+                          className="download-dropdown-item"
+                          onClick={() => setShowDownloads(false)}
+                        >
+                          <strong>{torrent.quality}</strong>
+                          <span>({torrent.size})</span>
+                        </a>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
           </div>
         </section>
