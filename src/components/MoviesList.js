@@ -118,7 +118,6 @@ function MoviesList() {
   const activeGenres = isTv ? tvGenres : movieGenres;
   const titleLabel = isTv ? "Series" : "Movies";
   const searchQuery = activeSearch.trim();
-  const normalizedSearch = searchQuery.toLowerCase();
   const visibleMovies = Movies;
   const heroMovie = visibleMovies[0];
   const trendingMovies = visibleMovies.slice(1, 6);
